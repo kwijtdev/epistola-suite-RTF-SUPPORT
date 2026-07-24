@@ -47,6 +47,7 @@ export function visualSchemaToJsonSchema(visual: VisualSchema): JsonSchema {
     properties,
     required: required.length > 0 ? required : undefined,
     additionalProperties: true,
+    ...(visual.richContent ? { richContent: visual.richContent } : {}),
   };
 }
 
@@ -160,7 +161,10 @@ export function jsonSchemaToVisualSchema(schema: JsonSchema | JsonObject | null)
     fields.push(jsonSchemaPropertyToField(name, prop, requiredFields.has(name), name));
   }
 
-  return { fields };
+  return {
+    fields,
+    richContent: jsonSchema.richContent,
+  };
 }
 
 /**

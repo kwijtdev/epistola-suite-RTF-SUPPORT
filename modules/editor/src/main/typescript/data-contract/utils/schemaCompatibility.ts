@@ -124,6 +124,14 @@ export function checkSchemaCompatibility(schema: unknown): CompatibilityResult {
     checkProperties(root.properties as Record<string, unknown>, '$.properties', issues);
   }
 
+  if (root.richContent && typeof root.richContent === 'object') {
+    checkProperty(
+      root.richContent as Record<string, unknown>,
+      '$.richContent',
+      issues,
+    );
+  }
+
   return { compatible: issues.length === 0, issues };
 }
 
