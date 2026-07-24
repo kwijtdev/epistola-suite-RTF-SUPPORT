@@ -53,6 +53,7 @@ data class PreviewDocument(
     val catalogKey: app.epistola.suite.common.ids.CatalogKey,
     val templateId: TemplateKey,
     val data: ObjectNode,
+    val richContent: ObjectNode? = null,
     val variantId: VariantKey? = null,
     val variantSelectionCriteria: VariantSelectionCriteria? = null,
     val versionId: VersionKey? = null,
@@ -139,12 +140,14 @@ class PreviewDocumentHandler(
             )
         }
 
-        val effectiveData = if (query.data.isEmpty) {
+        val baseData = if (query.data.isEmpty) {
             // No data provided — use first example from the version's contract
             contractVersion?.dataExamples?.firstOrNull()?.data ?: query.data
         } else {
             query.data
         }
+
+        val effectiveData = GenerationInputDataMerger.merge(baseData, query.richContent)
 
         // Validate data against contract schema
         val dataModel = contractVersion?.dataModel

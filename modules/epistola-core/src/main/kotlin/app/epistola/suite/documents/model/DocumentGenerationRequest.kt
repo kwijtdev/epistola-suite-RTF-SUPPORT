@@ -62,6 +62,7 @@ data class DocumentGenerationRequest(
     val versionKey: VersionKey?,
     val environmentKey: EnvironmentKey?,
     @Json val data: ObjectNode,
+    @Json val richContent: ObjectNode? = null,
     val filename: String?,
     val correlationId: String?,
     /**

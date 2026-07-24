@@ -68,7 +68,7 @@ class EpistolaDocumentGenerationApi(
         tenantId: String,
         previewDocumentRequest: PreviewDocumentRequest,
     ): ResponseEntity<Resource> {
-        val pdfBytes = previewDocumentRequest.toQuery(tenantId).query()
+        val pdfBytes = previewDocumentRequest.toQuery(tenantId, objectMapper).query()
 
         return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_PDF)

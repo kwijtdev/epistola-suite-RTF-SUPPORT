@@ -27,6 +27,7 @@ import app.epistola.suite.documents.queries.PreviewDocument
 import app.epistola.suite.templates.services.VariantSelectionCriteria
 import app.epistola.suite.time.EpistolaClock
 import tools.jackson.databind.ObjectMapper
+import tools.jackson.databind.node.ObjectNode
 
 /**
  * Extension functions for mapping between domain models and API DTOs.
@@ -116,6 +117,8 @@ internal fun GenerateDocumentRequest.toCommand(
     require(variantId == null || attributes == null) {
         "Cannot specify both variantId and attributes"
     }
+    val effectiveData = data.deepCopy()
+    val richContent = effectiveData.extractRichContent(objectMapper)
     return app.epistola.suite.documents.commands.GenerateDocument(
         tenantId = TenantKey.of(tenantId),
         catalogKey = CatalogKey.of(catalogId),
@@ -124,7 +127,8 @@ internal fun GenerateDocumentRequest.toCommand(
         variantSelectionCriteria = attributes?.toSelectionCriteria(),
         versionId = versionId?.let { VersionKey.of(it) },
         environmentId = environmentId?.let { EnvironmentKey.of(it) },
-        data = data,
+        data = effectiveData,
+        richContent = richContent,
         filename = filename,
         correlationId = correlationId,
         routingKey = routingKey,
@@ -137,6 +141,8 @@ internal fun app.epistola.api.model.BatchGenerationItem.toBatchItem(
     require(variantId == null || attributes == null) {
         "Cannot specify both variantId and attributes"
     }
+    val effectiveData = data.deepCopy()
+    val richContent = effectiveData.extractRichContent(objectMapper)
     return app.epistola.suite.documents.commands.BatchGenerationItem(
         catalogKey = CatalogKey.of(catalogId),
         templateId = TemplateKey.of(templateId),
@@ -144,11 +150,20 @@ internal fun app.epistola.api.model.BatchGenerationItem.toBatchItem(
         variantSelectionCriteria = attributes?.toSelectionCriteria(),
         versionId = versionId?.let { VersionKey.of(it) },
         environmentId = environmentId?.let { EnvironmentKey.of(it) },
-        data = data,
+        data = effectiveData,
+        richContent = richContent,
         filename = filename,
         correlationId = correlationId,
         routingKey = routingKey,
     )
+}
+
+private fun ObjectNode.extractRichContent(objectMapper: ObjectMapper): ObjectNode? {
+    val richContentNode = remove("richContent") ?: return null
+    if (!richContentNode.isObject) {
+        return null
+    }
+    return objectMapper.treeToValue(richContentNode, ObjectNode::class.java)
 }
 
 private fun List<VariantSelectionAttribute>.toSelectionCriteria(): VariantSelectionCriteria {
@@ -200,13 +215,19 @@ internal fun GenerateBatchRequest.toCommand(
 
 internal fun PreviewDocumentRequest.toQuery(
     tenantId: String,
-) = PreviewDocument(
-    tenantId = TenantKey.of(tenantId),
-    catalogKey = CatalogKey.of(catalogId),
-    templateId = TemplateKey.of(templateId),
-    variantId = variantId?.let { VariantKey.of(it) },
-    variantSelectionCriteria = attributes?.toSelectionCriteria(),
-    data = data,
-    versionId = versionId?.let { VersionKey.of(it) },
-    environmentId = environmentId?.let { EnvironmentKey.of(it) },
-)
+    objectMapper: ObjectMapper,
+): PreviewDocument {
+    val effectiveData = data.deepCopy()
+    val richContent = effectiveData.extractRichContent(objectMapper)
+    return PreviewDocument(
+        tenantId = TenantKey.of(tenantId),
+        catalogKey = CatalogKey.of(catalogId),
+        templateId = TemplateKey.of(templateId),
+        variantId = variantId?.let { VariantKey.of(it) },
+        variantSelectionCriteria = attributes?.toSelectionCriteria(),
+        data = effectiveData,
+        richContent = richContent,
+        versionId = versionId?.let { VersionKey.of(it) },
+        environmentId = environmentId?.let { EnvironmentKey.of(it) },
+    )
+}

@@ -437,6 +437,7 @@ class JobPoller(
                           document_generation_requests.version_key,
                           document_generation_requests.environment_key,
                           document_generation_requests.data,
+                          document_generation_requests.rich_content,
                           document_generation_requests.filename,
                           document_generation_requests.correlation_id,
                           document_generation_requests.routing_key,

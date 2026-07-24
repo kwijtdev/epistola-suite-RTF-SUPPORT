@@ -270,8 +270,9 @@ class DocumentGenerationExecutor(
             )
             contractVersion?.dataModel
         }
+        val effectiveData = GenerationInputDataMerger.merge(request.data, request.richContent)
         if (dataModel != null) {
-            val errors = schemaValidator.validate(dataModel, request.data)
+            val errors = schemaValidator.validate(dataModel, effectiveData)
             if (errors.isNotEmpty()) {
                 val errorMessages = errors.joinToString("; ") { "${it.path}: ${it.message}" }
                 throw IllegalArgumentException("Data validation failed: $errorMessages")
@@ -280,9 +281,8 @@ class DocumentGenerationExecutor(
 
         // 6. Generate PDF
         val outputStream = ByteArrayOutputStream()
-
         @Suppress("UNCHECKED_CAST")
-        val dataMap = objectMapper.convertValue(request.data, Map::class.java) as Map<String, Any?>
+        val dataMap = objectMapper.convertValue(effectiveData, Map::class.java) as Map<String, Any?>
         val metadata = PdfMetadata(
             title = template.name,
             author = tenant.name,
