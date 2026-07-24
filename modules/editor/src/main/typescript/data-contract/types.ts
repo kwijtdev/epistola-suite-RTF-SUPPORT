@@ -135,7 +135,7 @@ export interface SchemaFieldUpdate {
 /** Visual schema representation for the editor */
 export interface VisualSchema {
   fields: SchemaField[];
-  richContent?: JsonSchemaProperty;
+  richContent?: Record<string, JsonSchemaProperty>;
 }
 
 // =============================================================================
@@ -163,7 +163,7 @@ export interface JsonSchema {
   properties?: Record<string, JsonSchemaProperty>;
   required?: string[];
   additionalProperties?: boolean;
-  richContent?: JsonSchemaProperty;
+  richContent?: Record<string, JsonSchemaProperty>;
 }
 
 // =============================================================================

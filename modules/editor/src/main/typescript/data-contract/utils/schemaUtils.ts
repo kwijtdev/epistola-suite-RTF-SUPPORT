@@ -47,7 +47,7 @@ export function visualSchemaToJsonSchema(visual: VisualSchema): JsonSchema {
     properties,
     required: required.length > 0 ? required : undefined,
     additionalProperties: true,
-    ...(visual.richContent ? { richContent: visual.richContent } : {}),
+    richContent: visual.richContent,
   };
 }
 
