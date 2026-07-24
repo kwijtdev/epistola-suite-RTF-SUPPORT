@@ -15,6 +15,7 @@ import type {
   DataExample,
   JsonObject,
   JsonSchema,
+  JsonSchemaProperty,
   SaveCallbacks,
   SaveExamplesResult,
   SaveSchemaResult,
@@ -32,6 +33,8 @@ export class DataContractState extends EventTarget {
   private _schemaEditMode: SchemaEditMode = 'visual';
   private _rawJsonSchema: object | null = null;
   private _committedRawJsonSchema: object | null = null;
+
+  private _richContent: Record<string, JsonSchemaProperty> | undefined;
 
   private _callbacks: SaveCallbacks;
 
@@ -68,6 +71,10 @@ export class DataContractState extends EventTarget {
     return this._rawJsonSchema;
   }
 
+  get richContent(): Record<string, JsonSchemaProperty> | undefined {
+    return this._richContent;
+  }
+
   get isSchemaDirty(): boolean {
     if (this._schemaEditMode === 'json-only') {
       return JSON.stringify(this._rawJsonSchema) !== JSON.stringify(this._committedRawJsonSchema);
@@ -92,17 +99,25 @@ export class DataContractState extends EventTarget {
     this._fireChange();
   }
 
-  setRawJsonSchema(schema: object | null, mode: SchemaEditMode, asCommitted = false): void {
-    this._rawJsonSchema = schema ? structuredClone(schema) : null;
-    this._schemaEditMode = mode;
-    // Also update the draft schema for validation purposes (cast through unknown)
-    this._draftSchema = schema as unknown as JsonSchema | null;
-    if (asCommitted) {
-      this._committedRawJsonSchema = schema ? structuredClone(schema) : null;
-      this._committedSchema = structuredClone(this._draftSchema);
-    }
-    this._fireChange();
+setRawJsonSchema(schema: object | null, mode: SchemaEditMode, asCommitted = false): void {
+  this._rawJsonSchema = schema ? structuredClone(schema) : null;
+  this._schemaEditMode = mode;
+
+  const jsonSchema = schema as JsonSchema | null;
+
+  this._richContent = jsonSchema?.richContent
+    ? structuredClone(jsonSchema.richContent)
+    : undefined;
+
+  this._draftSchema = jsonSchema;
+
+  if (asCommitted) {
+    this._committedRawJsonSchema = schema ? structuredClone(schema) : null;
+    this._committedSchema = structuredClone(this._draftSchema);
   }
+
+  this._fireChange();
+}
 
   // ---------------------------------------------------------------------------
   // Example mutations

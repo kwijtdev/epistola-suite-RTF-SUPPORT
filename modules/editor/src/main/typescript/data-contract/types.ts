@@ -162,6 +162,7 @@ export interface JsonSchema {
   properties?: Record<string, JsonSchemaProperty>;
   required?: string[];
   additionalProperties?: boolean;
+  richContent?: Record<string, JsonSchemaProperty>;
 }
 
 // =============================================================================
