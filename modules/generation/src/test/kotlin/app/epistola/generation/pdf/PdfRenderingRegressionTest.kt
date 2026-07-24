@@ -136,8 +136,10 @@ class PdfRenderingRegressionTest {
             return
         }
 
-        val expected = Files.readString(baselineFile)
-        if (expected != extracted) {
+        val expected = Files.readString(baselineFile).replace("\r\n", "\n")
+        val actual = extracted.replace("\r\n", "\n")
+
+        if (expected != actual) {
             // Write actual output for easy diffing
             val actualFile = baselinesDir.resolve("$name.actual.txt")
             Files.writeString(actualFile, extracted)
