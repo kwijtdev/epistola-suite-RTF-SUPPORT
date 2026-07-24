@@ -4,6 +4,7 @@
 
 package app.epistola.suite.documents.batch
 
+import app.epistola.suite.documents.GenerationInputDataMerger
 import app.epistola.generation.pdf.AssetResolution
 import app.epistola.generation.pdf.AssetResolver
 import app.epistola.generation.pdf.PdfMetadata

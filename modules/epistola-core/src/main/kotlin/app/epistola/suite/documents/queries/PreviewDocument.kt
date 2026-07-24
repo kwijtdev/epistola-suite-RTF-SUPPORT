@@ -4,6 +4,7 @@
 
 package app.epistola.suite.documents.queries
 
+import app.epistola.suite.documents.GenerationInputDataMerger
 import app.epistola.suite.common.ids.CatalogId
 import app.epistola.suite.common.ids.EnvironmentId
 import app.epistola.suite.common.ids.EnvironmentKey
