@@ -48,6 +48,7 @@ const SUPPORTED_ROOT_KEYS = new Set([
   'properties',
   'required',
   'additionalProperties',
+  'richContent',
 ]);
 
 /** Keys allowed on a property (or items) definition */
