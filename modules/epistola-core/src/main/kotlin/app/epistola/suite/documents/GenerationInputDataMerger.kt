@@ -1,6 +1,5 @@
 package app.epistola.suite.documents
 
-import tools.jackson.databind.JsonNode
 import tools.jackson.databind.node.ObjectNode
 
 object GenerationInputDataMerger {
@@ -13,7 +12,7 @@ object GenerationInputDataMerger {
 
         richContent.properties().forEach { (name, value) ->
             if (!value.isNull) {
-                merged.set(name, value.deepCopy<JsonNode>())
+                merged.set(name, value.deepCopy())
             }
         }
 
